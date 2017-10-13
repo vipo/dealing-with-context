@@ -40,97 +40,163 @@ fully understood. .red[*]
 .footnote[.red[*] https://www.google.lt/search?q=context+definition]
 
 ---
-layout: false
-.left-column[
-  ## Standalone
-]
-.right-column[
-  ### Arguments
-- C++
-<pre><code>int main ( int argc, char *argv[] ) {}
-</code></pre>
-]
----
-layout: false
-.left-column[
-  ## Standalone
-  ## Globals
-]
-.right-column[
-  ### Arguments
-- C++
-<pre><code>int main ( int argc, char *argv[] ) {}
-</code></pre>
-]
+# Application Start
+
+- Environment variables
+  - $PATH, $PWD
 
 ---
-layout: false
-.left-column[
-  ## Standalone
-  ## Globals
-  ## Window
-]
-.right-column[
-  ### Arguments
-- C++
-<pre><code>int main ( int argc, char *argv[] ) {}
-</code></pre>
-]
----
-layout: false
-.left-column[
-  ## Standalone
-]
-.right-column[
-  ### Arguments
-- C++
-<pre><code>int main ( int argc, char *argv[] ) {}
-</code></pre>
-- Python
-<pre><code>import sys
-print "This is the name of the script: ", sys.argv[0]
-</code></pre>
-]
----
+# Application Start
 
-layout: false
-.left-column[
-  ## Standalone
-]
-.right-column[
-  ### Environment variables
-  $PATH, $PWD
-]
----
-layout: false
-.left-column[
-  ## Standalone
-]
-.right-column[
+- Environment variables
+  - $PATH, $PWD
+- File descriptors
+  - Files
+  - Stdin, stdout, stderr
 
-- $PATH, $PWD
+---
+# Application Start
+
+- Environment variables
+  - $PATH, $PWD
+- File descriptors
+  - Files
+  - Stdin, stdout, stderr
+- Ports
+  - Already open
+  - TIME-WAIT
+
+---
+# Application Start
+
+- Environment variables
+  - $PATH, $PWD
+- File descriptors
+  - Files
+  - Stdin, stdout, stderr
+- Ports
+  - Already open
+  - TIME-WAIT
+
+---
+# Application Start
 
 - Arguments
+  - As arguments (C, C++, Java,..)
+  <pre><code>int main ( int argc, char *argv[] ) {}
+  </code></pre>
 
-- Open ports
-]
 ---
-layout: false
+# Application Start
 
-.left-column[
-  ## Standalone
-  ## Stored Proc.
-]
-.right-column[
+- Arguments
+  - As arguments (C, C++, Java,..)
+  <pre><code>int main ( int argc, char *argv[] ) {}
+  </code></pre>
+  - As global value/variable (Python, Haskell,..)
+  <pre><code>import sys
+  print "This is the name of the script: ", sys\.argv[0]
+  </code></pre>
 
-- Slide scaling, thus similar appearance on all devices / resolutions .red[*]
 
-.footnote[.red[*] At least browsers try their best]
-]
 ---
+# Globals
 
-# Introduction
+- Old good ones
+<pre><code>#include<stdio.h>
+	// Global variables
+	int A;
+	int B;
 
+	int Add()
+	{
+		return A + B;
+	}
+
+	int main()
+	{
+		int answer; // Local variable
+		A = 5;
+		B = 7;
+		answer = Add();
+		printf("%d\n",answer);
+		return 0;
+	}
+</code></pre>
+
+---
+# Globals
+
+- Modern ones .red[*]
+<pre><code>$(document).ready(function() {
+      if(typeof window.isphone !== 'undefined') return;
+      window.isphone = false;
+      if(document.URL.indexOf("http://") === -1
+          && document.URL.indexOf("https://") === -1) {
+         	console.log("Its A Phone!!!");
+         window.isphone = true;
+      }
+
+      if( window.isphone ) {
+         document.addEventListener("deviceReady", mobileReady, false);
+      } else {
+         window.setTimeout(mobileReady, 50);
+      }
+});
+</code></pre>
+
+.footnote[.red[*] https://github.com/ControlEverythingCom/mobicle]
+
+---
+# Globals
+
+- Transactional ones
+<pre><code>CREATE PACKAGE my_public_package IS
+  my_var Number;
+END;
+</code></pre>
+<pre><code>my_public_package.my_var := 10;
+</code></pre>
+
+---
+# Globals
+
+- Transactional ones
+<pre><code>CREATE PACKAGE my_public_package IS
+  my_var Number;
+END;
+</code></pre>
+<pre><code>my_public_package.my_var := 10;
+</code></pre>
+
+- Thread locals
+<pre><code>ThreadLocal<String> myThreadLocal = new ThreadLocal<String>();
+myThreadLocal.set("Hello ThreadLocal");
+// from anywhere
+String threadLocalValue = myThreadLocal.get();
+</code></pre>
+
+---
+class: center, middle
+
+# A state. And it is global.
+
+---
+class: center, middle
+
+.center[![emc](emc.png)]
+
+---
+class: center, middle
+
+.center[![emc](wat.jpg)]
+
+---
+class: center, middle
+
+# Industry.
+
+---
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
