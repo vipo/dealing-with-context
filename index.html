@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dealing With Context</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .footnote { position: absolute; bottom: 3em; }
+      .red { color: #fa0000; }
+      /* Two-column layout */
+      .left-column { color: #777; width: 20%; height: 92%; float: left; }
+      .left-column h2:last-of-type, .left-column h3:last-child { color: #000; }
+      .right-column { width: 75%; float: right; padding-top: 1em; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle
+
+# Dealing With Context
+.footnote[Viačeslav Pozdniakov (Wix, VU)]
+---
+class: center, middle
+
+# Context
+
+The circumstances that form the setting for an event,
+statement, or idea, and in terms of which it can be
+fully understood. .red[*]
+
+.footnote[.red[*] https://www.google.lt/search?q=context+definition]
+
+---
+layout: false
+.left-column[
+  ## Standalone
+]
+.right-column[
+  ### Arguments
+- C++
+<pre><code>int main ( int argc, char *argv[] ) {}
+</code></pre>
+]
+---
+layout: false
+.left-column[
+  ## Standalone
+  ## Globals
+]
+.right-column[
+  ### Arguments
+- C++
+<pre><code>int main ( int argc, char *argv[] ) {}
+</code></pre>
+]
+
+---
+layout: false
+.left-column[
+  ## Standalone
+  ## Globals
+  ## Window
+]
+.right-column[
+  ### Arguments
+- C++
+<pre><code>int main ( int argc, char *argv[] ) {}
+</code></pre>
+]
+---
+layout: false
+.left-column[
+  ## Standalone
+]
+.right-column[
+  ### Arguments
+- C++
+<pre><code>int main ( int argc, char *argv[] ) {}
+</code></pre>
+- Python
+<pre><code>import sys
+print "This is the name of the script: ", sys.argv[0]
+</code></pre>
+]
+---
+
+layout: false
+.left-column[
+  ## Standalone
+]
+.right-column[
+  ### Environment variables
+  $PATH, $PWD
+]
+---
+layout: false
+.left-column[
+  ## Standalone
+]
+.right-column[
+
+- $PATH, $PWD
+
+- Arguments
+
+- Open ports
+]
+---
+layout: false
+
+.left-column[
+  ## Standalone
+  ## Stored Proc.
+]
+.right-column[
+
+- Slide scaling, thus similar appearance on all devices / resolutions .red[*]
+
+.footnote[.red[*] At least browsers try their best]
+]
+---
+
+# Introduction
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+  highlightLanguage: '-',
+  highlightStyle: 'monokai'
+    });
+    </script>
+  </body>
+</html>
