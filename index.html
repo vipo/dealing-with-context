@@ -20,6 +20,14 @@
       .left-column { color: #777; width: 20%; height: 92%; float: left; }
       .left-column h2:last-of-type, .left-column h3:last-child { color: #000; }
       .right-column { width: 75%; float: right; padding-top: 1em; }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th, td {
+        padding: 5px;
+        border: 1px solid black;
+      }
     </style>
   </head>
   <body>
@@ -69,18 +77,6 @@ fully understood. .red[*]
 ---
 # Application Start
 
-- Environment variables
-  - $PATH, $PWD
-- File descriptors
-  - Files
-  - Stdin, stdout, stderr
-- Ports
-  - Already open
-  - TIME-WAIT
-
----
-# Application Start
-
 - Arguments
   - As arguments (C, C++, Java,..)
   <pre><code>int main ( int argc, char *argv[] ) {}
@@ -97,7 +93,6 @@ fully understood. .red[*]
   <pre><code>import sys
   print "This is the name of the script: ", sys\.argv[0]
   </code></pre>
-
 
 ---
 # Globals
@@ -177,6 +172,34 @@ String threadLocalValue = myThreadLocal.get();
 </code></pre>
 
 ---
+
+# IoC globals
+
+<pre><code>@RestController
+@RequestMapping("/service/")
+public class Controller {
+    private int counter;
+}</code></pre>
+---
+
+# Multiplication of Evil
+
+<pre><code>@RestController
+@RequestMapping("/service/")
+public class Controller {
+    @Autowired
+    private Service service;
+}</code></pre>
+
+<pre><code>@Component
+public class Service {
+    private ThreadLocal<String> myThreadLocal = new ThreadLocal<String>();
+}
+</code></pre>
+
+---
+
+
 class: center, middle
 
 # A state. And it is global.
@@ -189,14 +212,450 @@ class: center, middle
 ---
 class: center, middle
 
-.center[![emc](wat.jpg)]
+.center[![wat](wat.jpg)]
 
 ---
 class: center, middle
 
-# Industry.
+.center[![emc](emc.png)]
 
 ---
+class: center, middle
+
+.center[![terr](terr.png)]
+
+---
+class: center, middle
+
+# Software Engineering is Oversimplified.
+
+---
+
+# Not quantity but quality
+
+## .center[e = mc<sup>2</sup>]
+
+.center[or more precise]
+
+## .center[Δe = Δmc<sup>2</sup>]
+
+
+where
+- e - errors (or energy )
+- m - modification (domain) complexity - complexity we cannot avoid
+- c - context complexity
+---
+
+# Pseudo Proof
+
+.center[![graph](graph.png)]
+
+---
+
+class: center, middle
+
+# We cannot eliminate context. But we can isolate it.
+
+---
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+]
+
+.right-column[
+<pre><code>object BasicServer extends TwitterServer {
+  val service = new Service[Request, Response] {
+    def apply(request: Request) = {
+      val response = Response(request.version, Status.Ok)
+      response.contentString = "hello"
+      Future.value(response)
+    }
+  }
+
+  def main() {
+    val server = Http.serve(":8888", service)
+    onExit {
+      server.close()
+    }
+    Await.ready(server)
+  }
+}</code></pre>
+]
+
+---
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+]
+
+.right-column[
+<pre><code>object BasicServer extends TwitterServer {
+  val service = new Service[Request, Response] {
+    def apply(request: Request) = {
+      val response = Response(request.version, Status.Ok)
+      response.contentString = "hello"
+      Future.value(response)
+    }
+  }
+
+  def main() {
+    val server = Http.serve(":8888", service)
+    onExit {
+      server.close()
+    }
+    Await.ready(server)
+  }
+}</code></pre>
+
+- database connection is still global
+- ...
+]
+
+---
+
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+]
+
+.right-column[
+<pre><code>val request = RequestContextHolder
+  .getRequestAttributes
+  .asInstanceOf [ServletRequestAttributes]
+  .getRequest
+</code></pre>
+]
+
+---
+
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+]
+
+.right-column[
+<pre><code>val request = RequestContextHolder
+  .getRequestAttributes
+  .asInstanceOf [ServletRequestAttributes]
+  .getRequest
+</code></pre>
+
+- fails in asynchronous environment
+- can I get a list of global variables?
+]
+
+---
+
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+  ### Language
+]
+
+.right-column[
+<pre><code>implicit val ec: ExecutionContext = ...
+val futureValue: Future[Result] = for {
+  result1 <- client.foo()
+  result2 <- client.boo(result1)
+} yield result2
+</code></pre>
+
+<pre><code>val route: Route =
+  path("order" / IntNumber) { id =>
+    get {
+      complete {
+        "Received GET request for order " + id
+      }
+    } ~
+    put {
+      complete {
+        "Received PUT request for order " + id
+      }
+    }
+  }
+</code></pre>
+]
+---
+
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+  ### Language
+]
+
+.right-column[
+
+<pre><code>implicit val ec: ExecutionContext = ...
+val futureValue: Future[Result] = for {
+  result1 <- client.foo()
+  result2 <- client.boo(result1)
+} yield result2
+</code></pre>
+
+<pre><code>val route: Route =
+  path("order" / IntNumber) { id =>
+    get {
+      complete {
+        "Received GET request for order " + id
+      }
+    } ~
+    put {
+      complete {
+        "Received PUT request for order " + id
+      }
+    }
+  }
+</code></pre>
+
+- database connection is still global
+
+]
+
+
+---
+
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+  ### Language
+  ### Monad Transformers
+]
+.right-column[
+<pre><code>type ScottyD = ScottyT Text (ReaderT (Pool Pipe) IO)
+type ActionD = ActionT Text (ReaderT (Pool Pipe) IO)
+
+main = do
+  pool <- createPool
+  let read = \r -> runReaderT r pool
+  scottyT 3000 read read basal
+
+rundb :: Action IO a -> ActionD (Either Failure a)
+rundb a = do
+  pool <- lift ask
+  ...
+</code></pre>
+]
+
+---
+
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+  ### Language
+  ### Monad Transformers
+]
+.right-column[
+<pre><code>type ScottyD = ScottyT Text (ReaderT (Pool Pipe) IO)
+type ActionD = ActionT Text (ReaderT (Pool Pipe) IO)
+
+main = do
+  pool <- createPool
+  let read = \r -> runReaderT r pool
+  scottyT 3000 read read basal
+
+rundb :: Action IO a -> ActionD (Either Failure a)
+rundb a = do
+  pool <- lift ask
+  ...
+</code></pre>
+
+- a little bit complex, no? :)
+]
+---
+
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+  ### Language
+  ### Monad Transformers
+  ### Free Monads
+]
+.right-column[
+<pre><code>sealed trait Commands[A]
+case class GetTweets(id: UserId) extends Commands[List[Tweet]]
+case class GetUserName(id: UserId) extends Commands[UserName]
+</code></pre>
+<pre><code>object Commands {
+  def getTweets(id: UserId): Free[UserId, List[Tweet]] =
+    Free.liftF[UserId, List[Tweet]](GetTweets(id))
+  ...
+}
+</code></pre>
+<pre><code>val program = for {
+  tweets <- getTweets(user)
+  userName <- getUserName(user)
+} yield (tweets, userName)</code></pre>
+]
+---
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+  ### Language
+  ### Monad Transformers
+  ### Free Monads
+]
+.right-column[
+###(2)
+<pre><code>object Interpreter extends (Commands ~> Id) {
+    def apply [A](in: Commands [A]): Id [A] =
+      in match {
+        case GetTweets(id) => ...
+        case GetUserName(id) => ...
+      }
+    }
+</code></pre>
+]
+
+---
+
+# Context Isolation Methods
+
+.left-column[
+  ### Arguments
+  ### Thread Local
+  ### Language
+  ### Monad Transformers
+  ### Free Monads
+]
+.right-column[
+###(2)
+<pre><code>object Interpreter extends (Commands ~> Id) {
+    def apply [A](in: Commands [A]): Id [A] =
+      in match {
+        case GetTweets(id) => ...
+        case GetUserName(id) => ...
+      }
+    }
+</code></pre>
+
+- too complicated
+- boilerplate
+]
+
+---
+class: center, middle
+
+# There is no silver bullet
+
+## But we have options
+
+---
+
+class: center, middle
+
+# How to make a mature choice?
+
+---
+
+.center[![cmmi](cmmi.svg)]
+
+.footnote[.red[*] https://en.wikipedia.org/wiki/Capability_Maturity_Model_Integration]
+
+---
+
+# Capability Maturity Model of Context Management (CMMCM)
+
+| Level | Name          | Definition    |
+| ----- | :------------ |:------------- |
+| 5     | Optimizing    | |
+| 4     | Measured      | |
+| 3     | Defined       | |
+| 2     | Managed       | |
+| 1     | Initial       | |
+| 0     | Capability    | You deliver business value.
+
+
+---
+
+# Capability Maturity Model of Context Management (CMMCM)
+
+| Level | Name          | Definition    |
+| ----- | :------------ |:------------- |
+| 5     | Optimizing    | |
+| 4     | Measured      | |
+| 3     | Defined       | |
+| 2     | Managed       | |
+| 1     | Initial       | You do not care. If it fails, you just fix |
+| 0     | Capability    | You deliver business value.
+
+
+---
+
+# Capability Maturity Model of Context Management (CMMCM)
+
+| Level | Name          | Definition    |
+| ----- | :------------ |:------------- |
+| 5     | Optimizing    | |
+| 4     | Measured      | |
+| 3     | Defined       | |
+| 2     | Managed       | You know context affects your codebase.                  |
+| 1     | Initial       | You do not care. If it fails, you just fix |
+| 0     | Capability    | You deliver business value.
+
+
+---
+
+# Capability Maturity Model of Context Management (CMMCM)
+
+| Level | Name          | Definition    |
+| ----- | :------------ |:------------- |
+| 5     | Optimizing    | |
+| 4     | Measured      | |
+| 3     | Defined       | You have rules (i.e. no globals, no IoC) |
+| 2     | Managed       | You know context affects your codebase.                 |
+| 1     | Initial       | You do not care. If it fails, you just fix |
+| 0     | Capability    | You deliver business value.
+
+---
+
+# Capability Maturity Model of Context Management (CMMCM)
+
+| Level | Name          | Definition    |
+| ----- | :------------ |:------------- |
+| 5     | Optimizing    |  |
+| 4     | Measured      | You can identify (count) which (and how) codebase is affected by a context |
+| 3     | Defined       | You have rules (i.e. no globals, no IoC) |
+| 2     | Managed       | You know context affects your codebase.                |
+| 1     | Initial       | You do not care. If it fails, you just fix |
+| 0     | Capability    | You deliver business value.
+
+---
+
+# Capability Maturity Model of Context Management (CMMCM)
+
+| Level | Name          | Definition    |
+| ----- | :------------ |:------------- |
+| 5     | Optimizing    | You improve |
+| 4     | Measured      | You can identify (count) which (and how) codebase is affected by a context |
+| 3     | Defined       | You have rules (i.e. no globals, no IoC) |
+| 2     | Managed       | You know context affects your codebase.                  |
+| 1     | Initial       | You do not care. If it fails, you just fix |
+| 0     | Capability    | You deliver business value.
+---
+class: center, middle
+
+# Thank you
+
+[@poznia](https://twitter.com/poznia)
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
